@@ -2,14 +2,15 @@ function Dx = b3(TR)
     arguments
         TR = delaunayTriangulation(rand(12,2));
     end
+    % стороны и вершины триангулированной сетки
     Edges = TR.edges;
     Points = TR.Points;
     n = size(Points, 1);
-
+    
+    % матрица производной по x
     Dx = sparse(n, n);
 
     for k = 1:length(Edges)
-
         i = Edges(k, 1);
         j = Edges(k, 2);
 
@@ -21,8 +22,5 @@ function Dx = b3(TR)
             Dx(j, i) = Dx(j, i) + 1 / delta_x;
             Dx(j, j) = Dx(j, j) - 1 / delta_x;
         end
-
     end
-
-
 end
