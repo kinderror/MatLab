@@ -1,44 +1,46 @@
 function normals = f3(TR)
-n = size(TR.Points);
-n = n(1);
-normals = zeros(n, 3);
-adjacency_matrix = sparse(n, n);
-neighbours_amount = zeros(n);
+n = size(TR.Points, 1);
+normals = zeros(n, 3); % матрица нормалей
+adjacency_matrix = sparse(n, n); % матрица смежности
+neighbours_amount = zeros(n); % матрица количества соседей
+% идентифицируем соседей
 for k = 1 : n
-    for l = 1 : n
-        if isConnected(TR, k, l)
-            adjacency_matrix(k, l) = 1;
+    for m = 1 : n
+        if isConnected(TR, k, m)
+            adjacency_matrix(k, m) = 1;
             neighbours_amount(k) = neighbours_amount(k) + 1;
         end
     end
 end
 for k = 1 : n
-    neighbors = zeros(neighbours_amount(k));
-    current_numb = 1;
-    for l = 1 : n
-        if adjacency_matrix(k, l) == 1
-            neighbors(current_numb) = l;
-            current_numb = current_numb + 1;
+    neighbors = zeros(neighbours_amount(k)); % матрица соседей
+    current = 1;
+    for m = 1 : n
+        if adjacency_matrix(k, m) == 1
+            neighbors(current) = m;
+            current = current + 1;
         end
     end
     triangle_numbers = 0;
-    for n1 = 1 : neighbours_amount(k)
-        for n2 = n1 + 1 : neighbours_amount(k)
-            if adjacency_matrix(n1, n2) == 1
+    for i = 1 : neighbours_amount(k)
+        for j = i + 1 : neighbours_amount(k)
+            if adjacency_matrix(i, j) == 1
                 triangle_numbers = triangle_numbers + 1;
-                normals(k, :) = normals(k, :) + calculate_triangle_normal(TR.Points(k, :), TR.Points(n1, :), TR.Points(n2, :));
+                normals(k, :) = normals(k, :) + calculate_triangle_normal(TR.Points(k, :), TR.Points(i, :), TR.Points(j, :));
             end
         end
     end
     normals(k, :) = normals(k, :)./triangle_numbers;
 end
+end
 
+% функция вычисления нормали
 function N = calculate_triangle_normal(v1, v2, v3)
 V = cat(1, v1, v2, v3);
 b = [1; 1; 1];
 x = V\b;
 N = (x/sqrt(sum(x.^2)))';
-
+end
 
 
     
