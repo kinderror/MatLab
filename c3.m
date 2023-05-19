@@ -14,7 +14,7 @@ function Dy = c3(TR)
         i = Edges(k, 1);
         j = Edges(k, 2);
 
-        delta_y = Points(j, 1) - Points(i, 1);
+        delta_y = Points(j, 2) - Points(i, 2);
 
         if delta_y ~= 0
             Dy(i, i) = Dy(i, i) - 1 / delta_y;
