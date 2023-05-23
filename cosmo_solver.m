@@ -8,31 +8,27 @@ function [W,Ws,sg] = cosmo_solver(XYZ,Q,P,S,e_in)
 % Ws - энергия взаимодействия зарядов только с поверхностными индуцированными зарядами.
 % sg - вектор nx1 значений поверхностной плотности зарядов в заданных вершинах сетки триангуляции.
 
-RDist = rev_dist(P, XYZ); % матрица расстояний от зарядов до поверхностей
-QRDist = rev_dist(XYZ, XYZ); % матрица расстояний между зарядами
-SRDist = rev_dist(P, P); % матрица расстояний между поверхностями
+RD = r_dist(P, XYZ); % матрица расстояний от зарядов до поверхностей
+QRD = r_dist(XYZ, XYZ); % матрица расстояний между зарядами
+SRD = r_dist(P, P); % матрица расстояний между поверхностями
 
-A = (SRDist).*(S');
-b = - 1 / e_in * (RDist') * Q;
+A = (SRD).*(S');
+b = - 1 / e_in * (RD') * Q;
 sg = A\b;
 q = sg.*S;
-Ws = 1/2 * Q' * RDist * (sg.*S);
-Wq = Q' * QRDist * Q / 2;
+Ws = 1/2 * Q' * RD * (sg.*S);
+Wq = Q' * QRD * Q / 2;
 W = Ws + Wq;
 
 % функция, вычисляющая матрицу расстояний                  
-function M = rev_dist(A, B)
+function M = r_dist(A, B)
 n = size(A, 1);
 m = size(B, 1);
 M = zeros(m, n);
 for i = 1 : m
     for j = 1 : n
-        if i ~= j || calculate_distance(B(i, :), A(j, :)) ~= 0
-            M(i, j) = 1/calculate_distance(B(i, :), A(j, :));
+        if i ~= j || norm(B(i, :) - A(j, :)) ~= 0
+            M(i, j) = 1/norm(B(i, :) - A(j, :));
         end
     end
 end
-
-% функция, вычисляющая расстояние
-function L = calculate_distance(v1, v2)
-L = sqrt(sum((v1 - v2).^2));
